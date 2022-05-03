@@ -3,16 +3,21 @@
  * https://www.youtube.com/watch?v=xLDViuYlqGM
  * 
  * Objetivo:
- * Ler um arquivo texto utilizando o bloco 'try with resources'.
- * o try with resources permite eu declarar o bloco try já instanciando os recursos na mesma linha do try.
- * A vantagem é que tudo que eu instanciar de recursos nessa mesma linha do try vai ser desalocado de forma
- * automática quando o escopo do try acabar
+ * Como ler um arquivo .CSV e transformá-lo em uma lista de objetos em memória
+ * Exemplo CSV separado por vírgula
+ * Name,Price,Quantity
+ * Notebook Gamer,2100.90,10
+ * Smartphone X,1890.00,23
+ * TV LED 70,3500.89,8
  */
 package br.com.wpatricio;
 
+import br.com.entidades.Produto;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Adptado por Wanderley Patrício de Sousa Neto
@@ -20,18 +25,30 @@ import java.io.IOException;
 public class LerTXTeCSV {
 
     public static void main(String[] args) {
-        String path = "C:\\0\\in.txt";
+        
+        String path = "C:\\0\\in.csv";
+        List<Produto> list = new ArrayList<Produto>(); // criei e instanciei uma lista do tipo Produto.
       
-        try(BufferedReader br = new BufferedReader(new FileReader(path))){ // criei o bloco try já instanciando os recursos
-          //  fr = new FileReader(path);   // Eu instanciei o BufferedReader e passei a instância do FileReader já como parâmetro
-          //  br = new BufferedReader(fr); // para o bloco try
-                                         
-            String line = br.readLine(); // para ler uma linha eu uso o método readLine
-            while(line != null){         // se eu chegar no final do arquivo o método readline() me retorna nulo. 
-                System.out.println(line);
+        try(BufferedReader br = new BufferedReader(new FileReader(path))){                           
+            
+            String line = br.readLine();        // ler a primeira (cabeçalho)
+            line = br.readLine();               // vou ler a linha novamente já que descartei o cabeçalho, para pegar o produto.
+            while(line != null){                // se eu chegar no final do arquivo o método readline() me retorna nulo. 
+                String[] vetor = line.split(","); // a função split faz um recorte baseado em um padrão específico de separação de ítens, nesse exemplo a ",".
+                String nome =  vetor[0];         
+                Double preco = Double.parseDouble(vetor[1]); // uso o Double.parseDouble como um cast, para converter o texto que está em String para Double.
+                Integer quantidade = Integer.parseInt(vetor[2]);
+                
+                Produto produto = new Produto(nome, preco, quantidade);
+                list.add(produto);
+                
                 line = br.readLine();
             }
-        } // quando o programa chegar aqui ou acontecer uma exceção e cair no bloco catch, automaticamente os recursos instanciados pelo try serão desalocados.
+            System.out.println("Produtos: ");
+            for (Produto p : list){ // para cada produto p na minha lista list eu vou mandar imprimir na tela esse p.
+                System.out.println(p);
+            }
+           } // quando o programa chegar aqui ou acontecer uma exceção e cair no bloco catch, automaticamente os recursos instanciados pelo try serão desalocados.
           // Outra vantagem desse método é que como ele já desaloca os recursos automaticamente eu não preciso do bloco finally
         catch(IOException e){
             System.out.println("Error: " + e.getMessage() );
